@@ -1,0 +1,67 @@
+{
+  "launcher": {
+    "name": "ZED'S DEAD",
+    "displayVersion": "1.1.5",
+    "credit": "ZED'S DEAD Launcher by Zed",
+    "version": "1.1.5",
+    "defaultLanguage": "fr",
+    "askBeforeLaunch": true,
+    "discordUrl": "https://discord.gg/FdHFq99DG",
+    "voteUrls": [
+      "https://top-games.net/scum/zeds-dead-pvpve-fren-modcustom-purges",
+      "https://top-serveurs.net/scum/zeds-dead-pvpve-fren-modcustom-purges"
+    ],
+    "musicFile": "launcher-music.mp3",
+    "musicVolume": 0.45,
+    "updateManifestUrl": "https://raw.githubusercontent.com/lacrampe09/zeddead-launcher-updates/main/update.json"
+  },
+  "game": {
+    "steamAppId": "513710",
+    "defaultInstallPath": "{programFilesX86}\\Steam\\steamapps\\common\\SCUM",
+    "launchArguments": [
+      "-fileopenlog",
+      "-nobattleye",
+      "-connectTo={host},{port}"
+    ],
+    "requiredExecutable": "SCUM\\Binaries\\Win64\\SCUM.exe"
+  },
+  "servers": [
+    {
+      "id": "zeds-dead-main",
+      "name": "ZED'S DEAD",
+      "host": "136.243.0.83",
+      "port": 7002,
+      "mode": "PvP / PvE",
+      "statusUrl": "https://api.battlemetrics.com/servers/39368304"
+    }
+  ],
+  "mods": {
+    "cacheDirectory": "{localAppData}\\ZedsDeadLauncher\\MOD",
+    "activeDirectory": "{scumPath}\\SCUM\\Content\\Paks\\~mods",
+    "inactiveDirectory": "{scumPath}\\SCUM\\Content\\Paks\\mods",
+    "autoInstallOnFirstRun": true,
+    "keepInstalledByDefault": true,
+    "packages": [
+      {
+        "id": "zeds-dead-all-in-one",
+        "name": "ZED'S DEAD Client sans minimap",
+        "version": "2026.10.27",
+        "kind": "pak",
+        "fileName": "ZEDDEAD_AllInOne_Client_Kamaz_MH6_280_AZERTY_NoMinimap_P.pak",
+        "url": "https://github.com/lacrampe09/zeddead/releases/download/v2026.10.27-no-minimap/ZEDDEAD_AllInOne_Client_Kamaz_MH6_280_AZERTY_NoMinimap_P.pak",
+        "sha256": "A2D76A64913715712C5201B8BA3A56735B6FBFE2F90C437D1B016D301173FD44"
+      },
+      {
+        "id": "zeds-dead-french-text",
+        "name": "ZED'S DEAD Texte français",
+        "version": "2026.10.27",
+        "kind": "pak",
+        "fileName": "zzzzzz_ZEDDEAD_FrenchText_1008_P.pak",
+        "url": "https://github.com/lacrampe09/zeddead/releases/download/v2026.10.27-no-minimap/zzzzzz_ZEDDEAD_FrenchText_1008_P.pak",
+        "sha256": "6E24FABD2FED59722A6754642E0E284D63A4988FA78630FC65C0F27B5EB31552"
+      }
+    ],
+    "manifestUrl": "https://raw.githubusercontent.com/lacrampe09/zeddead/main/mods.json"
+  }
+}
+
