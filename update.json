@@ -1,6 +1,6 @@
 {
-  "version": "1.1.5",
-  "downloadUrl": "https://github.com/lacrampe09/zeddead-launcher-updates/releases/download/v1.1.5/ZedsDeadLauncher-update-1.1.5.zip",
-  "sha256": "3CD3B2849CC73C87E75826747A408B46892848D69B0B62F2BEB9E6A6A6E69FCC",
-  "releaseNotes": "Détection et installation automatiques des mises à jour de mods publiées sur GitHub."
+  "version": "1.1.6",
+  "downloadUrl": "https://github.com/lacrampe09/zeddead-launcher-updates/releases/download/v1.1.6/ZedsDeadLauncher-update-1.1.6.zip",
+  "sha256": "9D5E2091C04126A66DAB745F031D46BF58672A7F84F0BE496CD46938E069FE4D",
+  "releaseNotes": "Correction encodage Windows PowerShell et mises a jour automatiques des mods GitHub."
 }
