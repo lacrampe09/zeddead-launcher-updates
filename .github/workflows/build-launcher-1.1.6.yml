@@ -1,0 +1,82 @@
+name: Build ZED'S DEAD Launcher 1.1.6
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/build-launcher-1.1.6.yml"
+      - "release-input/1.1.6/**"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build launcher and update package
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $bundle = Join-Path $env:RUNNER_TEMP 'bundle116'
+          $dist = Join-Path $env:GITHUB_WORKSPACE 'dist'
+          New-Item -ItemType Directory -Path $bundle,$dist -Force | Out-Null
+
+          $baseZip = Join-Path $env:RUNNER_TEMP 'base-1.1.4.zip'
+          Invoke-WebRequest 'https://github.com/lacrampe09/zeddead-launcher-updates/releases/download/v1.1.4/ZedsDeadLauncher-update-1.1.4.zip' -OutFile $baseZip
+          Expand-Archive -LiteralPath $baseZip -DestinationPath $bundle -Force
+          Copy-Item 'release-input/1.1.6/ZedsDeadLauncher.ps1' $bundle -Force
+          Copy-Item 'release-input/1.1.6/launcher.config.json' $bundle -Force
+          Copy-Item 'release-input/1.1.6/LauncherBootstrap.cs' $bundle -Force
+
+          # Windows PowerShell 5.1 requires a BOM to decode accented UI strings correctly.
+          $scriptPath = Join-Path $bundle 'ZedsDeadLauncher.ps1'
+          $scriptText = Get-Content -LiteralPath $scriptPath -Raw -Encoding utf8
+          [IO.File]::WriteAllText($scriptPath, $scriptText, [Text.UTF8Encoding]::new($true))
+
+          $resources = @(
+            'ZedsDeadLauncher.ps1','Apply-LauncherUpdate.ps1','Launcher.xaml','launcher.config.json',
+            'zeds-dead-background.png','zeds-dead-logo.png','zeds-dead-logo.ico','launcher-music.mp3'
+          )
+          $exe = Join-Path $dist 'ZedsDeadLauncher-1.1.6.exe'
+          $csc = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+          $arguments = @('/nologo','/target:winexe','/platform:anycpu','/optimize+','/reference:System.Windows.Forms.dll',('/win32icon:' + (Join-Path $bundle 'zeds-dead-logo.ico')),('/out:' + $exe))
+          foreach ($name in $resources) { $arguments += ('/resource:' + (Join-Path $bundle $name) + ',' + $name) }
+          $arguments += (Join-Path $bundle 'LauncherBootstrap.cs')
+          & $csc @arguments
+          if ($LASTEXITCODE -ne 0) { throw "Compilation échouée avec le code $LASTEXITCODE" }
+
+          $zip = Join-Path $dist 'ZedsDeadLauncher-update-1.1.6.zip'
+          $zipItems = $resources | ForEach-Object { Join-Path $bundle $_ }
+          Compress-Archive -LiteralPath $zipItems -DestinationPath $zip -CompressionLevel Optimal
+          $zipHash = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
+          $sevenZip = Join-Path $dist 'ZedsDeadLauncher-1.1.6.7z'
+          & 'C:\Program Files\7-Zip\7z.exe' a -t7z -mx=9 $sevenZip $exe
+          if ($LASTEXITCODE -ne 0) { throw "Création 7z échouée avec le code $LASTEXITCODE" }
+
+          $update = [ordered]@{
+            version = '1.1.6'
+            downloadUrl = 'https://github.com/lacrampe09/zeddead-launcher-updates/releases/download/v1.1.6/ZedsDeadLauncher-update-1.1.6.zip'
+            sha256 = $zipHash
+            releaseNotes = 'Correction de l’encodage Windows PowerShell et mises à jour automatiques des mods GitHub.'
+          }
+          $update | ConvertTo-Json | Set-Content -LiteralPath 'update.json' -Encoding utf8NoBOM
+
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.1.6 dist/ZedsDeadLauncher-1.1.6.exe dist/ZedsDeadLauncher-1.1.6.7z dist/ZedsDeadLauncher-update-1.1.6.zip --title "ZED'S DEAD Launcher 1.1.6" --notes "Corrige l’erreur de démarrage provoquée par l’encodage des accents dans Windows PowerShell. Le launcher vérifie toujours automatiquement les mises à jour des mods GitHub." --prerelease
+
+      - name: Publish update manifest
+        shell: pwsh
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add update.json
+          git commit -m 'Publish launcher update 1.1.6'
+          git push
+
