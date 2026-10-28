@@ -1,0 +1,32 @@
+name: Publish launcher 1.1.5 archive
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/publish-launcher-1.1.5-7z.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Create 7z archive
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $exe = Join-Path $env:RUNNER_TEMP 'ZedsDeadLauncher-1.1.5.exe'
+          $archive = Join-Path $env:RUNNER_TEMP 'ZedsDeadLauncher-1.1.5.7z'
+          Invoke-WebRequest 'https://github.com/lacrampe09/zeddead-launcher-updates/releases/download/v1.1.5/ZedsDeadLauncher-1.1.5.exe' -OutFile $exe
+          & 'C:\Program Files\7-Zip\7z.exe' a -t7z -mx=9 $archive $exe
+          if ($LASTEXITCODE -ne 0) { throw "Création 7z échouée avec le code $LASTEXITCODE" }
+          "ARCHIVE_PATH=$archive" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Add archive to release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload v1.1.5 "$env:ARCHIVE_PATH" --clobber --repo lacrampe09/zeddead-launcher-updates
+
