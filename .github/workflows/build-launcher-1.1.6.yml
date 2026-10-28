@@ -60,7 +60,7 @@ jobs:
             version = '1.1.6'
             downloadUrl = 'https://github.com/lacrampe09/zeddead-launcher-updates/releases/download/v1.1.6/ZedsDeadLauncher-update-1.1.6.zip'
             sha256 = $zipHash
-            releaseNotes = 'Correction de l’encodage Windows PowerShell et mises à jour automatiques des mods GitHub.'
+            releaseNotes = 'Correction encodage Windows PowerShell et mises a jour automatiques des mods GitHub.'
           }
           $update | ConvertTo-Json | Set-Content -LiteralPath 'update.json' -Encoding utf8NoBOM
 
